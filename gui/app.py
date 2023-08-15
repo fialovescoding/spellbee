@@ -1,5 +1,8 @@
+import context
+
 import streamlit as st
-from playsound import playsound
+# from playsound import playsound
+from data.crud import SpellBee_CrudManager
 
 # Word list
 word_list = ['mat', 'umbrella' , "cat" , "car" , "room" , "orphanage" , "day" , "goat"  "locomotion" , "garden"]
@@ -72,4 +75,7 @@ def show():
 
 
 # Main
+
+engine = SpellBee_CrudManager(recreate_table=False)
+
 show()
