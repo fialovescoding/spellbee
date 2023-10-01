@@ -15,3 +15,7 @@ class Word(PydanticBaseModel):
     student_id: str
     last_seen: Optional[int] = None
     type: WordType
+
+class NextWordList(PydanticBaseModel):
+    student_id: str
+    next_list: str

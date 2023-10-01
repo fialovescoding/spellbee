@@ -37,7 +37,10 @@ class SpellBee_CrudManager:
             'sk': (None, ['data']),
             'gsi1__sk': ('{0}#{1}', ['type', 'last_seen']),
         })
-
+        self.dbe.map_entity(NextWordList, {
+            'pk': ('@ClassName#{0}', ['student_id']),
+            'sk': (None, ['student_id']),
+        })
 
         if self.dbe.table is None or recreate_table:
             # Create Table
@@ -51,8 +54,8 @@ class SpellBee_CrudManager:
         # print(f'>>> Saving {entity}')
         self.dbe.put_item(entity)
 
-    def get_next_word(self, student_id: str, word_type: WordType) -> Word:
-        return self.dbe.query(
+    def get_next_word(self, student_id: str, word_type: WordType) -> Word | None:
+        result = self.dbe.query(
             entity=Word,
             constraints={
                 'student_id': QueryTerm(student_id, QueryConditionType.EQ),
@@ -60,6 +63,12 @@ class SpellBee_CrudManager:
             },
             limit=1
         )
+
+        if result is not None and len(result) == 1:
+            word: Word = result[0]
+            return word
+        else:
+            return None
     
     def add_new_word(self, student_id: str, word: str):
         new_word = Word(
@@ -78,3 +87,18 @@ class SpellBee_CrudManager:
             last_seen=int(datetime.now().timestamp())
         )
         self.dbe.put_item(new_word)
+    
+    def get_next_list(self, student_id: str):
+        result = self.dbe.query(
+            entity=NextWordList,
+            constraints={
+                'student_id': QueryTerm(student_id, QueryConditionType.EQ),
+            },
+        )
+
+        if result is not None and len(result) == 1:
+            return result[0]
+    
+    def set_next_list(self, student_id: str, next_list: str):
+        e = NextWordList(student_id=student_id, next_list=next_list)
+        self.dbe.put_item(e)
