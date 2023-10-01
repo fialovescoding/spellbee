@@ -29,10 +29,13 @@ class SpellBee_CrudManager:
 
         # Map Entities to fields
 
+        # TODO: add sort key as word, and gsi1__sk as type#last_seen which gets updated
+
         # <type>#<Last seen time> for the word used to sort all words for the student - so getting the 1st item using startswith(type), scanIndexForward = False
         self.dbe.map_entity(Word, {
             'pk': (None, ['student_id']),
-            'sk': ('{0}#{1}', ['type', 'last_seen']),
+            'sk': (None, ['data']),
+            'gsi1__sk': ('{0}#{1}', ['type', 'last_seen']),
         })
 
 
@@ -48,11 +51,14 @@ class SpellBee_CrudManager:
         # print(f'>>> Saving {entity}')
         self.dbe.put_item(entity)
 
-    def get_next_word(self, student_id: str, type: WordType) -> Word:
-        self.dbe.query(
+    def get_next_word(self, student_id: str, word_type: WordType) -> Word:
+        return self.dbe.query(
             entity=Word,
-            constraints={'type': type},
-            Limit=1
+            constraints={
+                'student_id': QueryTerm(student_id, QueryConditionType.EQ),
+                'type': QueryTerm(word_type, QueryConditionType.EQ),
+            },
+            limit=1
         )
     
     def add_new_word(self, student_id: str, word: str):
@@ -60,9 +66,15 @@ class SpellBee_CrudManager:
             student_id=student_id,
             type=WordType.NEW,
             data=word,
-            last_seen=datetime.now().timestamp()
+            last_seen=int(datetime.now().timestamp())
         )
         self.dbe.put_item(new_word)
     
     def update_word(self, student_id: str, word: Word, new_type: WordType):
-        pass
+        new_word = Word(
+            student_id=student_id,
+            type=new_type,
+            data=word.data,
+            last_seen=int(datetime.now().timestamp())
+        )
+        self.dbe.put_item(new_word)
