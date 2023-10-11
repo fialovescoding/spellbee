@@ -8,11 +8,11 @@ from data.models import *
 
 class SpellBee_CrudManager:
     def __init__(self, recreate_table: bool = False) -> None:
-        region_name = 'us-east-1'
+        # region_name = 'us-east-1'
         table_name = 'spellbee_shared_table'
 
         # Need high write capacity due to images for primary table
-        self.dbe = SingleTable(dyn_resource=boto3_wrap.getDynamoDbResource(), table_name=table_name)
+        self.dbe = SingleTable(dyn_resource=boto3_wrap.getDynamoDbResource(local_db=True), table_name=table_name)
 
         # Create table indices
         

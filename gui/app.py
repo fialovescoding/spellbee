@@ -25,12 +25,15 @@ app.on_startup(on_app_start)
 def show_spellbee():
     with main_area:
         for i in range(0,9):
+            print(f'Getting word {i}...\n')
             test_word = select_next_test_word(student_id)
             if test_word is not None:
                 ui.label(test_word.data)
                 
                 # TODO: update word
                 move_word_to_list(student_id, test_word, 'retest')
+            else:
+                print('Cound not get any word!')
 
 # App Layout and Containers #
 header = ui.header().classes(replace='row items-center')
@@ -62,8 +65,8 @@ with header:
     ui.button(on_click=lambda: sidebar.toggle(), icon='menu').props('flat color=white')
 
     # App Logo
-    ui.button(APP_TITLE, on_click=show_spellbee)
+    ui.button(APP_TITLE, on_click=lambda: show_spellbee())
 
 
 # Run the app
-ui.run(title=APP_TITLE)
+ui.run(title=APP_TITLE, port=8080)
