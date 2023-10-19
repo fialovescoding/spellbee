@@ -1,8 +1,8 @@
 print('From nicegui_client.app')
 import context
 
-from algorithm.word_select import *
-from data.models import *
+from core.logic import *
+# from data.models import *
 
 ##########################
 # NiceGui App Entry File #
@@ -22,16 +22,18 @@ def on_app_start():
 
 app.on_startup(on_app_start)
 
+logic_engine = SpellBee_LogicEngine()
+
 def show_spellbee():
     with main_area:
         for i in range(0,9):
             print(f'Getting word {i}...\n')
-            test_word = select_next_test_word(student_id)
+            test_word = logic_engine.select_next_test_word(student_id)
             if test_word is not None:
                 ui.label(test_word.data)
                 
                 # TODO: update word
-                move_word_to_list(student_id, test_word, 'retest')
+                logic_engine.move_word_to_list(student_id, test_word, 'retest')
             else:
                 print('Cound not get any word!')
 

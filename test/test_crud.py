@@ -1,10 +1,10 @@
 import context
 
-from data.crud import SpellBee_CrudManager
-from data.models import *
+from core.crud import SpellBee_CrudManager
+from core.models import *
 import random
 
-recreate = True
+recreate = False
 
 engine = SpellBee_CrudManager(recreate_table=recreate)
 
@@ -26,10 +26,7 @@ for i in range(0,9):
     word_type = random.choice(word_types)
     result = engine.get_next_word(student_id, word_type)
     if result is not None:
-        n = len(result)
-        assert(n <= 1)
-        if n == 1:
-            next_word = result[0]
-            print(next_word, word_type)
-            new_type = random.choice(non_new_word_types)
-            engine.update_word(student_id, next_word, new_type)
+        next_word = result
+        print(next_word, word_type)
+        new_type = random.choice(non_new_word_types)
+        engine.update_word(student_id, next_word, new_type)

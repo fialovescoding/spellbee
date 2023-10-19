@@ -4,7 +4,7 @@ from typing import List, Dict, Any
 from datetime import datetime
 
 from gm_saws.ddb import boto3_wrap, SingleTable, KeyType, IndexType, QueryTerm, QueryConditionType
-from data.models import *
+from core.models import *
 
 class SpellBee_CrudManager:
     def __init__(self, recreate_table: bool = False) -> None:
