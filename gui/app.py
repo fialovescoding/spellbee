@@ -25,17 +25,18 @@ app.on_startup(on_app_start)
 logic_engine = SpellBee_LogicEngine()
 
 def show_spellbee():
-    with main_area:
-        for i in range(0,9):
-            print(f'Getting word {i}...\n')
-            test_word = logic_engine.select_next_test_word(student_id)
-            if test_word is not None:
-                ui.label(test_word.data)
-                
-                # TODO: update word
-                logic_engine.move_word_to_list(student_id, test_word, 'retest')
-            else:
-                print('Cound not get any word!')
+    test_word = logic_engine.select_next_test_word(student_id)
+    if test_word is not None:
+        with main_area:
+            ui.label(test_word)
+            spelling = ui.input('Type the spelling')
+            ui.button('Check Spelling', on_click=lambda: logic_engine.check_spelling(
+                student_id, spelling.value, test_word))
+
+            # TODO: update word
+            # logic_engine.move_word_to_list(student_id, test_word, 'retest')
+    else:
+        ui.notify('Cound not get any word!', type='negative')
 
 # App Layout and Containers #
 header = ui.header().classes(replace='row items-center')
@@ -67,7 +68,7 @@ with header:
     ui.button(on_click=lambda: sidebar.toggle(), icon='menu').props('flat color=white')
 
     # App Logo
-    ui.button(APP_TITLE, on_click=lambda: show_spellbee())
+    ui.button('Next Word', on_click=lambda: show_spellbee())
 
 
 # Run the app
