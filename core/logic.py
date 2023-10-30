@@ -1,5 +1,6 @@
 from core.crud import SpellBee_CrudManager
 from core.models import *
+from datetime import datetime
 
 # def load_word_lists(student_id) -> Tuple[dict, str]:
 #     #TODO: load from db
@@ -42,7 +43,7 @@ class SpellBee_LogicEngine():
         return word_type
 
 
-    def _get_word_from_list(self, student_id: str, list_name: str) -> Word:
+    def _get_word_from_list(self, student_id: str, list_name: str) -> str:
         """Helper Function: Check if the list has any word, and if so, return the 1st word, else return None"""
         # list_: list = dict_of_lists[list_name]
         # if len(list_) > 0:
@@ -50,12 +51,18 @@ class SpellBee_LogicEngine():
         # else:
         #     word = None
 
+        print(f'Getting word from {list_name} list...')
+
+        # Get the word type
         word_type = self._get_word_type_from_list_name(list_name)
 
         # Get next word in list from database
         word = self.crud_engine.get_next_word(student_id, word_type)
 
-        return word
+        if word is not None:
+            return word.data
+        else:
+            return None
 
 
     def _get_next_word_list_name(self, student_id: str):
@@ -67,32 +74,51 @@ class SpellBee_LogicEngine():
         self.crud_engine.set_next_list(student_id, next_list)
 
 
-    def move_word_to_list(self, student_id: str, word: Word, next_list: str):
+    def move_word_to_list(self, student_id: str, word: str, next_list: str, last_seen: int = None):
         word_type = self._get_word_type_from_list_name(next_list)
 
-        self.crud_engine.update_word(student_id, word, word_type)
+        if last_seen is None:
+            last_seen=int(datetime.now().timestamp())
 
+        word_obj = Word(student_id=student_id, data=word,
+                        type=word_type, last_seen=last_seen)
+
+        self.crud_engine.update_word(student_id, word_obj, word_type)
+
+    def check_spelling(self, student_id, spelling: str, test_word: str):
+        if str.lower(spelling) == str.lower(test_word):
+            # Correct
+            self.move_word_to_list(student_id, test_word, 'correct')
+            return True
+        else:
+            # Wrong
+            self.move_word_to_list(student_id, test_word, 'incorrect')
+            return False
 
     def select_next_test_word(self, student_id) -> Word:
-        list_name: NextWordList = self._get_next_word_list_name(student_id)
+        # Get the list from which next word to be taken
+        list_name = self._get_next_word_list_name(student_id)
 
         if list_name is None:
+            # Can't find any stored list name, set to new
             list_name = 'new'
-            self._set_next_word_list_name(student_id, list_name)
-        else:
-            list_name = list_name.next_list
+            # self._set_next_word_list_name(student_id, list_name)
 
+        # Get the next word from list
         word = self._get_word_from_list(student_id, list_name)
 
-        if list_name == 'new':
-            next_list = 'retest'
-        elif list_name == 'retest':
-            next_list = 'new'
-
-        # Update next word list
-        self._set_next_word_list_name(student_id, next_list)
-
-        return word
+        if word is not None:
+            if list_name == 'new':
+                next_list = 'retest'
+            elif list_name == 'retest':
+                next_list = 'new'
+            
+            # Update next word list
+            self._set_next_word_list_name(student_id, next_list)
+            
+            return word
+        else:
+            return None
 
         # Check which list to check next (new or retest)
         if next_list_name == 'new':

@@ -93,7 +93,7 @@ class SpellBee_CrudManager:
         )
         self.dbe.put_item(new_word)
     
-    def get_next_list(self, student_id: str):
+    def get_next_list(self, student_id: str) -> str:
         result = self.dbe.query(
             entity=NextWordList,
             constraints={
@@ -102,7 +102,10 @@ class SpellBee_CrudManager:
         )
 
         if result is not None and len(result) == 1:
-            return result[0]
+            return result[0].next_list
+        else:
+            return None
+    
     
     def set_next_list(self, student_id: str, next_list: str):
         e = NextWordList(student_id=student_id, next_list=next_list)
