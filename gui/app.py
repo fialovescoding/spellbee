@@ -72,4 +72,4 @@ with header:
 
 
 # Run the app
-ui.run(title=APP_TITLE, port=8080)
+ui.run(title=APP_TITLE, port=8000)
