@@ -4,7 +4,7 @@ from core.crud import SpellBee_CrudManager
 from core.models import *
 import random
 
-recreate = False
+recreate = True
 
 engine = SpellBee_CrudManager(recreate_table=recreate)
 
