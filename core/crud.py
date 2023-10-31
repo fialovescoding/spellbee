@@ -5,13 +5,15 @@ from datetime import datetime
 
 from gm_saws.ddb import boto3_wrap, SingleTable, KeyType, IndexType, QueryTerm, QueryConditionType
 from core.models import *
-from core.utils import ReadConfig
+# from core.utils import ReadConfig
+from gm_saws.utils import IsDevEnv, ReadConfig
 
 class SpellBee_CrudManager:
     def __init__(self, recreate_table: bool = False) -> None:
         # Get db config
         app_config = ReadConfig()
-        ddb_local: bool = app_config['ddb_local']
+        # If dev-env, force use local db
+        ddb_local: bool = app_config['ddb_local'] or IsDevEnv()
 
         # region_name = 'us-east-1'
         table_name = 'spellbee_shared_table'
