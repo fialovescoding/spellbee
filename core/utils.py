@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import sys
 from datetime import datetime, timedelta
+import yaml
 
 def time_uid() -> int:
     """Generates a time dependent unique-id"""
@@ -54,6 +55,20 @@ def GetFullPath(rel_path):
     else:
         return os.path.join(base, rel_path)
     
+def ReadConfig(secrets: bool = False) -> dict:
+    # Import Config
+    if secrets:
+        fpath = 'config/secrets.yaml'
+    else:
+        fpath = 'config/app.yaml'
+
+    config = yaml.safe_load(open(GetFullPath(fpath)))
+
+    if type is not None:
+        return config
+
+    return config
+
 def clamp(n, nmin, nmax):
     """Returns the number n after clamping between nmin and nmax"""
     return (max(nmin, min(n, nmax)))
