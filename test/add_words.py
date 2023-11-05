@@ -13,8 +13,47 @@ if recreate:
     engine.set_next_list(student_id, 'new')
 
 # Add your words here
-word_list = ['mat', 'umbrella' , "cat" , "car" , "room" , "orphanage" , "day" ,
-             "goat",  "locomotion" , "garden"]
+word_list = [
+    "excitement" ,
+    "board" , 
+    "compartment" , 
+    "stationmaster" , 
+    "bubbling" , 
+    "stagecoaches" , 
+    "boiler" , 
+    "locomotives" ,
+    "generator" , 
+    "polluting" , 
+    "fibrousroot" , 
+    "nutrients" , 
+    "cotyledon" , 
+    "embryo" , 
+    "germination" , 
+    "mulch" , 
+    "seedcoat" , 
+    "photosynthesis" , 
+    "reproduction" , 
+    "adequate" , 
+    "heritage" , 
+    "ancestor"
+    "monument"
+    "matirial"
+    "sculpture"
+    "historical"
+    "ancient"
+    "attraction"
+    "effigy"
+    "exiled"
+    "skewing"
+    "accessories"
+    "absolutly"
+    "existing"
+    "horizontly"
+    "questient"
+    "resize"
+    "crop"
+    "selection"
+    "colour_picker" ]
 
 add_words = True
 if add_words:

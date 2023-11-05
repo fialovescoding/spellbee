@@ -19,3 +19,9 @@ class Word(PydanticBaseModel):
 class NextWordList(PydanticBaseModel):
     student_id: str
     next_list: str
+
+class Student(PydanticBaseModel):
+    student_id: str
+    name: str
+    grade_section: str
+    school_id: str
