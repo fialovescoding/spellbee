@@ -14,6 +14,8 @@ import os
 import uuid
 import time
 
+# TODO: (AWS Polly) https://docs.aws.amazon.com/polly/latest/dg/get-started-what-next.html
+
 def play_text():
     txt = st.session_state['txtbox']
     myobj = gTTS(text=txt, lang='en', slow=False)
