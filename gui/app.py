@@ -24,19 +24,27 @@ app.on_startup(on_app_start)
 
 logic_engine = SpellBee_LogicEngine()
 
-def show_spellbee():
-    test_word = logic_engine.select_next_test_word(student_id)
-    if test_word is not None:
-        with main_area:
-            ui.label(test_word)
-            spelling = ui.input('Type the spelling')
-            ui.button('Check Spelling', on_click=lambda: logic_engine.check_spelling(
-                student_id, spelling.value, test_word))
-
-            # TODO: update word
-            # logic_engine.move_word_to_list(student_id, test_word, 'retest')
+def check_spelling(spelling: str, test_word: str):
+    result = logic_engine.check_spelling(student_id, spelling, test_word)
+    if result:
+        ui.notify('Yah! You are right :)', type='positive')
     else:
-        ui.notify('Cound not get any word!', type='negative')
+        ui.notify('Oho! Wrong spelling', type='negative')
+    show_spellbee()
+
+def show_spellbee():
+    test_word, list_name = logic_engine.select_next_test_word(student_id)
+    if test_word is not None:
+        main_area.clear()
+        with main_area:
+            ui.label(test_word).tailwind.font_weight('bold')
+            ui.label(f'Taken from list: {list_name}').tailwind.font_style('italic').text_color('blue-400')
+            spelling = ui.input('Type the spelling')
+
+            # Check spelling and update word to correct or incorrect list
+            ui.button('Check Spelling', on_click=lambda: check_spelling(spelling.value, test_word))
+    else:
+        ui.notify('Could not get any word!', type='negative')
 
 # App Layout and Containers #
 header = ui.header().classes(replace='row items-center')
@@ -68,7 +76,10 @@ with header:
     ui.button(on_click=lambda: sidebar.toggle(), icon='menu').props('flat color=white')
 
     # App Logo
-    ui.button('Next Word', on_click=lambda: show_spellbee())
+    ui.icon('spellcheck').tailwind.font_size('lg')
+    ui.label('Spell Bee').tailwind.font_weight('extrabold')
+
+    ui.button('Start Test', on_click=lambda: show_spellbee())
 
 
 # Run the app

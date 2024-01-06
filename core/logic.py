@@ -96,7 +96,10 @@ class SpellBee_LogicEngine():
             return False
 
     def select_next_test_word(self, student_id) -> Word:
-        # Get the list from which next word to be taken
+        list_order = ['new', 'incorrect', 'correct']
+        num_lists = len(list_order)
+
+        # Get the list (from db) from which next word to be taken
         list_name = self._get_next_word_list_name(student_id)
 
         if list_name is None:
@@ -104,61 +107,28 @@ class SpellBee_LogicEngine():
             list_name = 'new'
             # self._set_next_word_list_name(student_id, list_name)
 
-        # Get the next word from list
-        word = self._get_word_from_list(student_id, list_name)
+        # Start with word = None, and try to find word in each of the lists (in list_order)
+        word = None
 
-        if word is not None:
-            if list_name == 'new':
-                next_list = 'retest'
-            elif list_name == 'retest':
-                next_list = 'new'
-            
-            # Update next word list
-            self._set_next_word_list_name(student_id, next_list)
-            
-            return word
-        else:
-            return None
+        count = 0
+        while word is None and count < num_lists:
+            # Treat list_order as a circular list, and find the next list index
+            next_list_index = (list_order.index(list_name) + 1) % num_lists
+            next_list = list_order[next_list_index]
 
-        # Check which list to check next (new or retest)
-        if next_list_name == 'new':
-            list_order = ['new', 'retest', 'incorrect', 'correct']
-        else:
-            # next_list_name should be 'retest' here
-            list_order = ['retest', 'new', 'incorrect', 'correct']
+            # Get the next word from list
+            word = self._get_word_from_list(student_id, list_name)
 
-        for list_name in list_order:
-            # Check if list has any word
-            word = get_word_from_list(student_id, list_name) #, dict_of_lists)
-            if word is not None:
-                # We found the word, update variables and return the word
+            # Increase count of how many times we have checked a list for next word
+            count = count + 1
 
-                if list_name == 'new':
-                    next_list_name = 'retest'
-                elif list_name == 'retest':
-                    next_list_name = 'new'
-
-                # TODO: save the updated lists to db
-
-                return word
-            # else, check next list - the loop will do it for us
-
-    # Check the code
-    # next_word = select_next_test_word(0)
-    # if next_word is not None:
-    #     print(next_word)
-
-
-        # Example to access lists_dict to get a list by its name
-        # new_list: list = lists_dict['new']
-        # if len(new_list) > 0:
-        #     # Get the 1st element of list (FIFO)
-        #     word = new_list.pop()  
-        # elif len(lists_dict['retest']) > 0:
-        #     word = lists_dict['retest'][0]
-        # elif len(lists_dict['incorrect']) > 0:
-        #     word = lists_dict['incorrect'][0]
-        # elif len(lists_dict['correct']) > 0:
-        #     word = lists_dict['correct'][0]
-
-        # return word
+            if word is None:
+                # Word not found in the selected list, check in other list
+                list_name = next_list
+            else:
+                # Word is found, update the next list
+                # TODO: are we going to chase the same word :)
+                self._set_next_word_list_name(student_id, next_list)
+                
+                # Return the word to UI
+                return word, list_name
